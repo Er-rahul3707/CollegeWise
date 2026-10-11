@@ -6,13 +6,30 @@
 [![Spring Boot 3.3.5](https://img.shields.io/badge/Spring%20Boot-3.3.5-6DB33F?logo=springboot&logoColor=white)](https://spring.io/projects/spring-boot)
 [![Maven](https://img.shields.io/badge/Build-Maven-C71A36?logo=apachemaven&logoColor=white)](https://maven.apache.org/)
 [![MySQL 8](https://img.shields.io/badge/Database-MySQL%208-4479A1?logo=mysql&logoColor=white)](https://www.mysql.com/)
+[![CI](https://github.com/Er-rahul3707/CollegeWise/actions/workflows/maven.yml/badge.svg?branch=main)](https://github.com/Er-rahul3707/CollegeWise/actions/workflows/maven.yml)
+[![HTML5](https://img.shields.io/badge/HTML5-E34F26?logo=html5&logoColor=white)](https://developer.mozilla.org/docs/Web/HTML)
+[![CSS3](https://img.shields.io/badge/CSS3-1572B6?logo=css3&logoColor=white)](https://developer.mozilla.org/docs/Web/CSS)
+[![Bootstrap 5](https://img.shields.io/badge/Bootstrap-5-7952B3?logo=bootstrap&logoColor=white)](https://getbootstrap.com/)
+[![Vanilla JavaScript](https://img.shields.io/badge/JavaScript-Vanilla-F7DF1E?logo=javascript&logoColor=black)](https://developer.mozilla.org/docs/Web/JavaScript)
 
 CollegeWise is a Java full-stack capstone for exploring Indian engineering colleges. Students can filter a seeded catalogue, compare colleges, save favorites, and review explainable profile-fit recommendations. Spring Boot serves both the REST API and the static HTML/CSS/JavaScript interface from one application.
 
 > Fees, placement values, rankings, and cutoffs in the demonstration catalogue are illustrative. Recommendation scores are rule-based fit guidance and are not admission probabilities or guarantees. Confirm current information with each institution.
 
+## Project documentation
+
+| Guide | What it covers |
+| --- | --- |
+| [Setup guide](SETUP_GUIDE.md) | Windows setup, MySQL, environment variables, run instructions |
+| [Architecture](PROJECT_ARCHITECTURE.md) | Application components and request flow |
+| [API documentation](API_DOCUMENTATION.md) | REST routes, authentication, and examples |
+| [Database schema](DATABASE_SCHEMA.md) | JPA entities and relationships |
+| [Recommendation algorithm](RECOMMENDATION_ALGORITHM.md) | Rule-based score factors and limits |
+| [Testing guide](TESTING.md) | Automated checks and verified audit scope |
+
 ## Contents
 
+- [Project documentation](#project-documentation)
 - [Features](#features)
 - [Technology](#technology)
 - [Architecture](#architecture)
@@ -44,7 +61,7 @@ CollegeWise is a Java full-stack capstone for exploring Indian engineering colle
 | Demo data | Idempotent sample catalogue with 20 colleges and related course, branch, cutoff and placement data |
 | Interface | HTML5, CSS3, Bootstrap 5 and vanilla JavaScript, served as Spring Boot static resources |
 
-The checklist reflects the implemented API and automated/live API checks. A complete authenticated UI journey in a real browser has **not** been verified in the latest recorded audit; see [Verification](#verification).
+The feature list describes available capabilities; the verification summary below distinguishes automated tests, live API checks, and browser workflows.
 
 ## Technology
 
@@ -150,19 +167,20 @@ JSON endpoints are rooted under `/api`; see [API_DOCUMENTATION.md](API_DOCUMENTA
 
 ## Verification
 
-Latest local automated validation on **2026-10-12**:
+The latest release audit (2026-10-12) recorded the following results:
 
-- `mvn clean test`: **PASS**, 14 tests, zero failures/errors/skips, using H2.
-- `mvn clean package`: **PASS**.
-- `node --check`: **PASS** for all four frontend scripts.
-- MySQL API workflows: **PASS** in the isolated temporary schema as recorded on 2026-10-11. The configured `collegewise` schema was not used for test writes; the temporary schema was removed after the run.
-- Authenticated browser UI journey: **NOT VERIFIED**. The live workflow used HTTP API clients, not browser automation.
+- **Automated tests: PASS.** `mvn clean test` ran 14 tests with zero failures, errors, or skips using isolated in-memory H2.
+- **Package build: PASS.** `mvn clean package` completed successfully.
+- **Frontend syntax: PASS.** `node --check` passed for `app.js`, `dashboard.js`, `college.js`, and `admin.js`.
+- **MySQL: PASS.** The packaged application initialized schema and seed data in a temporary local `collegewise_test` schema and returned HTTP 200 from `/api/health`. The configured `collegewise` schema was not used for test writes; the temporary schema was removed afterward.
+- **Student browser workflow: PASS.** Registration, login/logout, profile updates, recommendations and reasons, history, favorites, college details, search/filters, and comparison of up to three colleges were exercised in the local browser.
+- **Admin workflow: PARTIAL.** Admin sign-in, dashboard, and create/edit flows for colleges, courses, branches, cutoffs, and placements were exercised. The actual UI Delete click was not; protected delete and related-record cleanup are covered by an automated regression test.
+- **Responsive check: PARTIAL.** The browser showed no horizontal overflow at a 714-pixel viewport. A dedicated phone-width viewport was not tested.
 
-See [TESTING.md](TESTING.md) for scope and limitations. Passing automated tests and API checks do not certify the illustrative catalogue data.
-
+See [TESTING.md](TESTING.md) for the detailed scope. Demo catalogue values are illustrative; scores are not admission probabilities or guarantees.
 ## Screenshots
 
-No screenshots are checked into this repository. Add genuine screenshots after capturing the running application; do not use mockups as evidence of tested behavior.
+No application screenshots are checked into this repository (the tracked SVG is only the favicon). Add genuine screenshots only after capturing the running application; do not use mockups as evidence of tested behavior.
 
 ## Security notes
 
@@ -177,7 +195,7 @@ No screenshots are checked into this repository. Add genuine screenshots after c
 - Email verification, password reset, refresh tokens, and server-side token revocation are not implemented.
 - Catalogue ranking, fees, cutoffs, and placement figures are illustrative; an institution may change them.
 - The recommendation score is rule-based and does not predict admission outcomes.
-- Authenticated browser journeys and responsive behavior still need a manual or automated browser audit.
+- The admin Delete button has not been clicked in the browser, and a dedicated phone-width layout check remains outstanding; see [Verification](#verification).
 - Hibernate schema update is suitable for this capstone, not a production migration strategy; production deployment should use reviewed database migrations and operational controls.
 
 ## Troubleshooting
@@ -205,16 +223,4 @@ The preserved Git history includes earlier CollegeWise work credited to Aman Pus
 
 ## License
 
-No `LICENSE` file or project license statement is present. Do not assume that this repository grants reuse rights; preserve any third-party license terms. Add a project license only after its intended terms are established.
-
-## Latest verification — 2026-10-12
-
-- `mvn clean test`: **PASS**, 14 tests, zero failures/errors/skips, using H2.
-- `mvn clean package`: **PASS**.
-- JavaScript syntax: **PASS**, all four frontend scripts.
-- Live MySQL startup and catalogue: **PASS** against the isolated `collegewise_test` schema on localhost; the configured `collegewise` schema was not targeted.
-- Student discovery and authenticated browser journey: **PASS** in the actual browser, including registration/login/logout, profile update, recommendations and reasons, history, favorites add/remove, college details, filtering, three-college comparison, and four-college validation.
-- Admin browser journey: **PARTIAL**. Admin sign-in, dashboard, and create/edit screens for college, course, branch, cutoff, and placement passed. Dashboard counters now refresh after saves and when Reload is pressed. The UI Delete click was not exercised; protected delete/cascade behavior is covered by the automated regression test. See [TESTING.md](TESTING.md).
-- Browser diagnostics: zero application-origin console errors; no horizontal overflow at the 714-pixel viewport. A dedicated phone-size check is not verified.
-
-See [TESTING.md](TESTING.md) for exact scope. Recommendation scores are rule-based fit guidance, not admission guarantees; seeded fees, rankings, placement values, and cutoffs are illustrative.
+No root `LICENSE` file or repository-wide license statement is present. The retained legacy Node backend declares `ISC` in `backend/package.json`; that package metadata does not establish a license for the entire repository. Earlier Git history credits prior CollegeWise work to Aman Pushpakar, as noted above. Preserve applicable third-party notices and licenses; do not assume that the repository grants reuse rights.
