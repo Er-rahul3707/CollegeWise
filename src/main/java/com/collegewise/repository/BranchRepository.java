@@ -1,0 +1,3 @@
+package com.collegewise.repository;
+import com.collegewise.entity.*; import java.util.List; import java.util.Optional; import org.springframework.data.jpa.repository.JpaRepository; import org.springframework.data.jpa.repository.EntityGraph;
+public interface BranchRepository extends JpaRepository<Branch,Long>{void deleteByCollege(College college);void deleteByCollegeId(Long collegeId);Optional<Branch> findByCollegeIdAndNameIgnoreCase(Long collegeId,String name);@EntityGraph(attributePaths="college") List<Branch> findByCollegeId(Long collegeId);@Override @EntityGraph(attributePaths="college") List<Branch> findAll();}

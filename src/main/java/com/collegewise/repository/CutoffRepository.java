@@ -1,0 +1,3 @@
+package com.collegewise.repository;
+import com.collegewise.entity.*; import java.util.List; import org.springframework.data.jpa.repository.JpaRepository;import org.springframework.data.jpa.repository.EntityGraph;
+public interface CutoffRepository extends JpaRepository<Cutoff,Long>{List<Cutoff> findByCollege(College college);@EntityGraph(attributePaths={"college","course","branch"}) List<Cutoff> findByCollegeIn(java.util.Collection<College> colleges);void deleteByCollege(College college);void deleteByCourse(Course course);void deleteByBranch(Branch branch);@Override @EntityGraph(attributePaths={"college","course","branch"}) List<Cutoff> findAll();}

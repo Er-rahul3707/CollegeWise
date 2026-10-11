@@ -1,0 +1,3 @@
+package com.collegewise.repository;
+import com.collegewise.entity.*;import java.util.List;import org.springframework.data.jpa.repository.JpaRepository;import org.springframework.data.jpa.repository.EntityGraph;
+public interface PlacementRepository extends JpaRepository<Placement,Long>{List<Placement> findByCollegeId(Long collegeId);@EntityGraph(attributePaths={"college","course"}) List<Placement> findByCollegeIn(java.util.Collection<College> colleges);void deleteByCollege(College college);void deleteByCourse(Course course);@Override @EntityGraph(attributePaths={"college","course"}) List<Placement> findAll();}

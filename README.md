@@ -1,146 +1,58 @@
-# 🎓 CollegeWise — Smart College Comparison & Career Guidance System
+# CollegeWise — Smart College Comparison & Career Guidance System
 
-> **A full-stack higher education discovery and comparison platform engineered to help students find, evaluate, and shortlist institutions across India using verified metrics, multi-factor comparison matrices, and algorithmic guidance.**
+**Developed by Rahul Chandra Sharma & Team**
 
-*Made with Love ❤️ By - Aman Pushpakar & Team*
+CollegeWise helps students explore Indian engineering colleges, compare options, and review profile-based recommendations with visible reasons and admission-cutoff compatibility. It is a Java full stack capstone: one Spring Boot application serves the REST API and its packaged web interface.
 
----
+## Features
 
-## 🌟 Highlights & Key Capabilities
+- Student registration, sign-in, BCrypt password storage, JWT authentication, and profile management.
+- Paginated college discovery with text search, state/city, fee, hostel, and sorting filters.
+- College detail pages with related courses, branches, cutoff examples, and placement summaries.
+- Profile-aware recommendations with match scores, reasons, concerns, cutoff compatibility, and history.
+- Student favorites and college comparison for two or three colleges.
+- Role-protected administrator dashboard and CRUD for colleges, courses, branches, cutoffs, and placements.
+- Twenty restart-safe demo colleges with related catalogue data, enabled by default. Set `SEED_DEMO_DATA=false` to disable demo catalogue seeding.
 
-- **🔍 Smart Multi-Filter Search**: Search across hundreds of colleges by city, state, course stream, annual tuition budget, and national rankings.
-- **⚖️ 3-Way Side-by-Side Comparison Matrix**: Compare up to 3 colleges simultaneously across tuition fees, average packages, typical cut-offs, student ratings, and campus infrastructure.
-- **🧠 Personalized Career Guidance Engine**: Weighted matching algorithm calculating real-time compatibility based on 12th board marks, entrance percentiles (JEE Main, CUET, NEET, etc.), stream preference, budget, and career ambitions (Corporate, Research, Startup).
-- **📋 Student Shortlist & Dashboard**: Save favourite institutions, track application priorities, and view recommended matches.
-- **🛡️ Administrative Control Suite**: Secure management interface for real-time CRUD operations on colleges, cut-off updates, placement records, and ranking revisions with audit logging.
-- **⚡ Dual-Mode Deployment**: Serves as a standalone frontend (via VS Code Live Server) or a full-stack unified application with the Express server.
+Demo fees, placement figures, and cutoffs are illustrative estimates, not official admissions or outcomes. Confirm current information with each institution. The catalogue notes its NIRF 2025 ranking reference and links to institution websites.
 
----
+## Technology and architecture
 
-## 🛠️ Technology Stack
+- **Frontend:** HTML5, CSS3, Bootstrap 5, and vanilla JavaScript. Static assets are served by Spring Boot; no Node.js runtime or separate frontend server is needed.
+- **Backend:** Java 17, Spring Boot 3.3.5, Spring MVC, Spring Security, JWT, Jakarta Validation, Spring Data JPA, and Hibernate.
+- **Application database:** MySQL 8+ using MySQL Connector/J. H2 is test-scope only and is not a runtime fallback.
+- **Build:** Maven 3.9+.
 
-| Layer | Technologies |
-|---|---|
-| **Frontend** | HTML5, CSS3 (Modern Flexbox & Grid, CSS Variables), Vanilla JavaScript (ES6+) |
-| **Typography** | Google Fonts (*Plus Jakarta Sans*, *DM Sans*) |
-| **Backend** | Node.js (v18+), Express.js framework |
-| **Database** | SQLite3 via `better-sqlite3` (with WAL mode enabled) |
-| **Authentication** | JSON Web Tokens (JWT) & `bcryptjs` password hashing |
-| **Security & Middleware** | Role-Based Access Control (RBAC), CORS, Dotenv |
-
----
-
-## 🏗️ System Architecture
-
-```
-┌─────────────────────────────────────────────────────────────┐
-│                    Frontend UI Client                       │
-│  - Semantic HTML5 Pages + Responsive CSS3                   │
-│  - Dynamic DOM Rendering with Vanilla JS                    │
-│  - Client-side State, Search/Filter, Local Fallback         │
-└──────────────────────────────┬──────────────────────────────┘
-                               │ RESTful APIs (JSON / JWT)
-                               ▼
-┌─────────────────────────────────────────────────────────────┐
-│                 Express.js Application Server               │
-│  - Port 5001 (Configurable via .env)                        │
-│  - JWT Verification & Role Authorization Middleware         │
-│  - Static Asset Hosting for Frontend                        │
-│  - Recommendation Engine Business Logic                     │
-└──────────────────────────────┬──────────────────────────────┘
-                               │ SQL Queries
-                               ▼
-┌─────────────────────────────────────────────────────────────┐
-│                   SQLite Relational Database                │
-│  - Users Table (Students & Administrators)                  │
-│  - Colleges Table (NIRF Ranks, Fees, Placements, Cutoffs)   │
-│  - Favourites Table (User-to-College Bookmarks)             │
-│  - Activity Logs Table (System Audit Trails)                │
-└─────────────────────────────────────────────────────────────┘
+```text
+Browser → same-origin REST/JSON → Spring MVC + Security/JWT
+        → services → Spring Data JPA/Hibernate → MySQL
 ```
 
----
+See [PROJECT_ARCHITECTURE.md](PROJECT_ARCHITECTURE.md), [DATABASE_SCHEMA.md](DATABASE_SCHEMA.md), and [API_DOCUMENTATION.md](API_DOCUMENTATION.md) for implementation details.
 
-## 📁 Repository Structure
+## Database and local setup
 
-```
-CollegeWise/
-├── index.html                  # Landing page (Hero, metrics, features, popular colleges)
-├── about.html                  # About Us (Mission, workflow, full-stack architecture)
-├── colleges.html               # College directory with multi-tier filters and sorting
-├── college-details.html        # Detailed college profile & institutional statistics
-├── compare.html                # 3-Way side-by-side comparative parameter table
-├── recommendation.html         # Weighted career guidance recommendation engine
-├── dashboard.html              # Student dashboard & shortlist summary
-├── favourites.html             # Saved favourite colleges view
-├── login.html                  # Unified student & admin login portal
-├── register.html               # Student registration form
-├── Project-Overview.md         # Comprehensive project documentation
-│
-├── css/
-│   └── style.css               # Unified styling (responsive design system)
-│
-├── js/
-│   └── app.js                  # Frontend client (API integration & local fallback)
-│
-├── admin/
-│   ├── admin-dashboard.html    # Admin analytics metrics & live activity log
-│   ├── admin-login.html        # Dedicated administrator authentication portal
-│   ├── manage-colleges.html    # Full CRUD management for colleges
-│   ├── manage-cutoffs.html     # Live cut-off percentage updater
-│   ├── manage-placements.html  # Average package data updater
-│   └── manage-rankings.html    # Institutional rankings updater
-│
-└── backend/
-    ├── package.json            # Node dependencies & npm scripts
-    ├── server.js               # Main Express entry point & static file server
-    ├── .env                    # Environment configuration (Port 5001, JWT Secret)
-    ├── config/
-    │   └── db.js               # Database schema initialization & auto-seeder
-    ├── middleware/
-    │   └── auth.js             # JWT verification & role authorization
-    ├── routes/
-    │   ├── authRoutes.js       # Register, login, profile verification
-    │   ├── collegeRoutes.js    # College queries, filters, and admin CRUD
-    │   ├── compareRoutes.js    # Multi-college comparative matrix generator
-    │   ├── recommendRoutes.js  # Weighted recommendation algorithm
-    │   ├── favouriteRoutes.js  # Student shortlist persistence
-    │   └── adminRoutes.js      # System analytics & audit log handlers
-    └── data/
-        └── collegewise.db      # SQLite relational database file
+Install JDK 17+, Maven 3.9+, and MySQL 8+. Create the `collegewise` database and a local MySQL user, then configure `DB_URL`, `DB_USERNAME`, `DB_PASSWORD`, and a random `JWT_SECRET` of at least 32 bytes. Spring Boot does not automatically load `.env`; use process or Windows User environment variables. Do not commit real credentials.
+
+The app defaults to `jdbc:mysql://localhost:3306/collegewise`; see [SETUP_GUIDE.md](SETUP_GUIDE.md) for the complete MySQL setup, PowerShell instructions, demo student bootstrap, and admin bootstrap. There are no committed/default account credentials. Set `ADMIN_EMAIL` and `ADMIN_PASSWORD` before the first start to create an administrator. To provision a reusable local student demo account, use the `demo` Spring profile and set `DEMO_STUDENT_EMAIL` and `DEMO_STUDENT_PASSWORD`; this profile is for local development/presentations only.
+
+Run:
+
+```powershell
+mvn clean test
+mvn clean package
+mvn spring-boot:run
 ```
 
+Open [http://localhost:8080](http://localhost:8080). The JSON API is rooted at `/api`; the catalogue health check is `GET /api/health`. H2 is used only by automated tests. For a packaged build, run `java -jar target\collegewise-1.0.0.jar` after setting the required environment variables.
 
+## Verification and limits
 
-## 📡 REST API Summary
+Automated coverage is described in [TESTING.md](TESTING.md). H2-backed tests verify application behavior, not a live MySQL instance; run the application against configured MySQL for a live connection check. The demo recommendation score is a rule-based guide and must not be interpreted as admission assurance. Email verification, password reset, token revocation, and refresh tokens are not implemented. Stateless logout clears the browser token.
 
-### Authentication
-- `POST /api/auth/register` — Create student account
-- `POST /api/auth/login` — Sign in and receive JWT token
-- `GET /api/auth/me` — Verify authenticated profile
+## Attribution
 
-### Colleges & Directory
-- `GET /api/colleges` — Search & filter (`?q=`, `?location=`, `?course=`, `?budget=`, `?sort=`)
-- `GET /api/colleges/:id` — Single college profile
-- `POST /api/colleges` — Add new college *(Admin)*
-- `PUT /api/colleges/:id` — Update college info, cut-offs, placements *(Admin)*
-- `DELETE /api/colleges/:id` — Remove college record *(Admin)*
+**CollegeWise — Smart College Comparison & Career Guidance System**
+**Developed by Rahul Chandra Sharma & Team**
 
-### Comparison & Recommendation
-- `GET /api/colleges/compare?ids=1,2,9` — 3-Way side-by-side comparison matrix
-- `POST /api/recommendations` — Algorithmic recommendation engine
-
-### Student Shortlists
-- `GET /api/favourites` — Retrieve student's saved colleges
-- `POST /api/favourites/toggle` — Add or remove a college from favourites
-
-### Admin Analytics
-- `GET /api/admin/stats` — Live system stats (Total colleges, users, uptime)
-- `GET /api/admin/activity` — Administrative activity audit trail
-
----
-
-## 📄 License & Attribution
-
-Developed with Love ❤️ By **Aman Pushpakar & Team**  
-*CollegeWise — Smart College Comparison and Career Guidance System*
+Preserve any third-party notices supplied with dependencies or source material. This project attribution does not imply authorship of third-party work.

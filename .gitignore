@@ -2,15 +2,58 @@
 backend/node_modules/
 node_modules/
 
-# Environment Variables
+# Environment variables and local credentials
 backend/.env
 .env
+.env.*
+!.env.example
+*.env
+.envrc
 
-# Database temp files
+# Generated build output
+/target/
+/build/
+/out/
+*.class
+*.jar
+*.war
+
+# IDE and local configuration
+.idea/
+.vscode/
+*.iml
+application-local.properties
+application-local.*
+application-secrets.properties
+application-secrets.*
+application-credentials.properties
+credentials.properties
+local.properties
+*.local.*
+
+# Secrets and certificates
+*.secret
+*.credentials
+.secrets/
+secrets/
+*.pem
+*.key
+*.jks
+*.p12
+*.keystore
+secrets.*
+
+# Runtime logs
+*.log
+
+# Database files and temporary SQLite files
 backend/data/*.db
 backend/data/*.db-wal
 backend/data/*.db-shm
 backend/data/*.db-journal
+*.db
+*.sqlite
+*.sqlite3
 
 # OS files
 .DS_Store

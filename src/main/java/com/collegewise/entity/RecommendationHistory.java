@@ -1,0 +1,4 @@
+package com.collegewise.entity;
+import jakarta.persistence.*; import java.time.Instant;
+@Entity @Table(indexes=@Index(name="idx_recommendation_user_date",columnList="user_id,created_at"))
+public class RecommendationHistory { @Id @GeneratedValue(strategy=GenerationType.IDENTITY) private Long id; @ManyToOne(fetch=FetchType.LAZY,optional=false) private User user; @ManyToOne(fetch=FetchType.LAZY,optional=false) private College college; @Column(nullable=false) private int score; @Column(name="created_at",nullable=false) private Instant createdAt=Instant.now(); protected RecommendationHistory(){} public RecommendationHistory(User user,College college,int score){this.user=user;this.college=college;this.score=score;} public Long getId(){return id;} public User getUser(){return user;} public College getCollege(){return college;} public int getScore(){return score;} public Instant getCreatedAt(){return createdAt;} }

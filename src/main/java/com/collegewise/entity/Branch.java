@@ -1,0 +1,4 @@
+package com.collegewise.entity;
+import jakarta.persistence.*;
+@Entity @Table(uniqueConstraints=@UniqueConstraint(columnNames={"college_id","name"}))
+public class Branch { @Id @GeneratedValue(strategy=GenerationType.IDENTITY) private Long id; @ManyToOne(fetch=FetchType.LAZY,optional=false) @JoinColumn(name="college_id") private College college; @Column(nullable=false,length=100) private String name; @Column(length=500) private String description; protected Branch(){} public Branch(College college,String name,String description){this.college=college;this.name=name;this.description=description;} public Long getId(){return id;} public College getCollege(){return college;} public String getName(){return name;} public String getDescription(){return description;} public void updateFrom(Branch b){this.college=b.college;this.name=b.name;this.description=b.description;} }

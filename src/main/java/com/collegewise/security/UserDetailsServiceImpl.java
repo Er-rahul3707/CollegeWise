@@ -1,0 +1,3 @@
+package com.collegewise.security;
+import com.collegewise.repository.UserRepository; import org.springframework.security.core.userdetails.*; import org.springframework.stereotype.Service;
+@Service public class UserDetailsServiceImpl implements UserDetailsService { private final UserRepository users; public UserDetailsServiceImpl(UserRepository users){this.users=users;} public UserDetails loadUserByUsername(String email){var user=users.findByEmailIgnoreCase(email).orElseThrow(()->new UsernameNotFoundException("User not found"));return org.springframework.security.core.userdetails.User.withUsername(user.getEmail()).password(user.getPassword()).disabled(!user.isActive()).roles(user.getRole().name()).build();} }

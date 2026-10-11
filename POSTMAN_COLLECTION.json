@@ -1,0 +1,569 @@
+{
+  "info": {
+    "name": "CollegeWise API",
+    "description": "Set token to the token returned by login. Student routes need a student token; admin routes need an environment-provisioned admin token.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:8080/api"
+    },
+    {
+      "key": "token",
+      "value": ""
+    },
+    {
+      "key": "collegeId",
+      "value": "1"
+    }
+  ],
+  "item": [
+    {
+      "name": "Register student",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\"name\":\"Demo Student\",\"email\":\"student@example.com\",\"password\":\"change-this-password\"}"
+        },
+        "url": "{{baseUrl}}/auth/register"
+      }
+    },
+    {
+      "name": "Login",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\"email\":\"student@example.com\",\"password\":\"change-this-password\"}"
+        },
+        "url": "{{baseUrl}}/auth/login"
+      }
+    },
+    {
+      "name": "Logout (discard client token)",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          }
+        ],
+        "url": "{{baseUrl}}/auth/logout"
+      }
+    },
+    {
+      "name": "College list with filters",
+      "request": {
+        "method": "GET",
+        "url": "{{baseUrl}}/colleges?page=0&size=12&q=demo&state=Karnataka&maxFees=250000&hostel=true&sort=fees"
+      }
+    },
+    {
+      "name": "College search",
+      "request": {
+        "method": "GET",
+        "url": "{{baseUrl}}/colleges/search?q=engineering&page=0&size=12"
+      }
+    },
+    {
+      "name": "College details",
+      "request": {
+        "method": "GET",
+        "url": "{{baseUrl}}/colleges/{{collegeId}}"
+      }
+    },
+    {
+      "name": "Get student profile",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          }
+        ],
+        "url": "{{baseUrl}}/students/profile"
+      }
+    },
+    {
+      "name": "Update student profile",
+      "request": {
+        "method": "PUT",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          },
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\"tenthPercentage\":85,\"twelfthPercentage\":91,\"entranceExam\":\"JEE Main\",\"examYear\":2025,\"rank\":18000,\"percentile\":96.2,\"category\":\"OPEN\",\"preferredCourse\":\"B.Tech\",\"preferredBranch\":\"Computer Science and Engineering\",\"preferredState\":\"Karnataka\",\"maximumBudget\":250000,\"hostelRequired\":true,\"careerInterest\":\"Data science\"}"
+        },
+        "url": "{{baseUrl}}/students/profile"
+      }
+    },
+    {
+      "name": "Recommendations",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          }
+        ],
+        "url": "{{baseUrl}}/students/recommendations"
+      }
+    },
+    {
+      "name": "Recommendation history",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          }
+        ],
+        "url": "{{baseUrl}}/students/recommendations/history"
+      }
+    },
+    {
+      "name": "List favorites",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          }
+        ],
+        "url": "{{baseUrl}}/students/favorites"
+      }
+    },
+    {
+      "name": "Add favorite",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          }
+        ],
+        "url": "{{baseUrl}}/students/favorites/{{collegeId}}"
+      }
+    },
+    {
+      "name": "Remove favorite",
+      "request": {
+        "method": "DELETE",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          }
+        ],
+        "url": "{{baseUrl}}/students/favorites/{{collegeId}}"
+      }
+    },
+    {
+      "name": "Compare colleges",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          }
+        ],
+        "url": "{{baseUrl}}/students/compare?ids=1&ids=2"
+      }
+    },
+    {
+      "name": "Admin dashboard",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          }
+        ],
+        "url": "{{baseUrl}}/admin/dashboard"
+      }
+    },
+    {
+      "name": "Admin create college",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          },
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\"name\":\"New College\",\"state\":\"Karnataka\",\"city\":\"Mysuru\",\"fees\":150000,\"ranking\":125,\"hostelAvailable\":true}"
+        },
+        "url": "{{baseUrl}}/admin/colleges"
+      }
+    },
+    {
+      "name": "Admin update college",
+      "request": {
+        "method": "PUT",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          },
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\"name\":\"Updated College\",\"state\":\"Karnataka\",\"city\":\"Mysuru\",\"fees\":175000,\"ranking\":120,\"hostelAvailable\":true}"
+        },
+        "url": "{{baseUrl}}/admin/colleges/{{collegeId}}"
+      }
+    },
+    {
+      "name": "Admin delete college",
+      "request": {
+        "method": "DELETE",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          }
+        ],
+        "url": "{{baseUrl}}/admin/colleges/{{collegeId}}"
+      }
+    },
+    {
+      "name": "Admin add course",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          },
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\"name\":\"MCA\",\"description\":\"Master of Computer Applications\"}"
+        },
+        "url": "{{baseUrl}}/admin/courses"
+      }
+    },
+    {
+      "name": "Admin list courses",
+      "request": {
+        "url": "{{baseUrl}}/admin/courses",
+        "method": "GET",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          }
+        ]
+      }
+    },
+    {
+      "name": "Admin update course",
+      "request": {
+        "url": "{{baseUrl}}/admin/courses/1",
+        "method": "PUT",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          },
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\"name\":\"BCA Updated\",\"description\":\"Updated course\"}"
+        }
+      }
+    },
+    {
+      "name": "Admin delete course",
+      "request": {
+        "url": "{{baseUrl}}/admin/courses/1",
+        "method": "DELETE",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          }
+        ]
+      }
+    },
+    {
+      "name": "Admin list branches",
+      "request": {
+        "url": "{{baseUrl}}/admin/branches",
+        "method": "GET",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          }
+        ]
+      }
+    },
+    {
+      "name": "Admin add branch",
+      "request": {
+        "url": "{{baseUrl}}/admin/branches",
+        "method": "POST",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          },
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\"collegeId\":1,\"name\":\"Computer Science\",\"description\":\"\"}"
+        }
+      }
+    },
+    {
+      "name": "Admin update branch",
+      "request": {
+        "url": "{{baseUrl}}/admin/branches/1",
+        "method": "PUT",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          },
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\"collegeId\":1,\"name\":\"Computer Science Updated\",\"description\":\"\"}"
+        }
+      }
+    },
+    {
+      "name": "Admin delete branch",
+      "request": {
+        "url": "{{baseUrl}}/admin/branches/1",
+        "method": "DELETE",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          }
+        ]
+      }
+    },
+    {
+      "name": "Admin list cutoffs",
+      "request": {
+        "url": "{{baseUrl}}/admin/cutoffs",
+        "method": "GET",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          }
+        ]
+      }
+    },
+    {
+      "name": "Admin add cutoff",
+      "request": {
+        "url": "{{baseUrl}}/admin/cutoffs",
+        "method": "POST",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          },
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\"collegeId\":1,\"entranceExam\":\"JEE Main\",\"examYear\":2025,\"category\":\"OPEN\",\"closingRank\":25000,\"closingPercentile\":92.0}"
+        }
+      }
+    },
+    {
+      "name": "Admin update cutoff",
+      "request": {
+        "url": "{{baseUrl}}/admin/cutoffs/1",
+        "method": "PUT",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          },
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\"collegeId\":1,\"entranceExam\":\"JEE Main\",\"examYear\":2025,\"category\":\"OPEN\",\"closingRank\":24000,\"closingPercentile\":93.0}"
+        }
+      }
+    },
+    {
+      "name": "Admin delete cutoff",
+      "request": {
+        "url": "{{baseUrl}}/admin/cutoffs/1",
+        "method": "DELETE",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          }
+        ]
+      }
+    },
+    {
+      "name": "Admin list placements",
+      "request": {
+        "url": "{{baseUrl}}/admin/placements",
+        "method": "GET",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          }
+        ]
+      }
+    },
+    {
+      "name": "Admin add placement",
+      "request": {
+        "url": "{{baseUrl}}/admin/placements",
+        "method": "POST",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          },
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\"collegeId\":1,\"year\":2025,\"studentsPlaced\":80,\"studentsEligible\":100,\"averagePackage\":1200000,\"highestPackage\":3000000}"
+        }
+      }
+    },
+    {
+      "name": "Admin update placement",
+      "request": {
+        "url": "{{baseUrl}}/admin/placements/1",
+        "method": "PUT",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          },
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\"collegeId\":1,\"year\":2025,\"studentsPlaced\":82,\"studentsEligible\":100,\"averagePackage\":1250000,\"highestPackage\":3000000}"
+        }
+      }
+    },
+    {
+      "name": "Admin delete placement",
+      "request": {
+        "url": "{{baseUrl}}/admin/placements/1",
+        "method": "DELETE",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          }
+        ]
+      }
+    },
+    {
+      "name": "Admin list users",
+      "request": {
+        "url": "{{baseUrl}}/admin/users?page=0&size=25",
+        "method": "GET",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          }
+        ]
+      }
+    },
+    {
+      "name": "Admin disable user",
+      "request": {
+        "url": "{{baseUrl}}/admin/users/1/active?active=false",
+        "method": "PATCH",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          }
+        ]
+      }
+    }
+  ]
+}
