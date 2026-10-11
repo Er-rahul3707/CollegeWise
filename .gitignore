@@ -58,3 +58,15 @@ backend/data/*.db-journal
 # OS files
 .DS_Store
 Thumbs.db
+
+# Local database exports and backups (keep private data out of Git)
+*.sql
+!src/main/resources/db/migration/**/*.sql
+*.sql.gz
+*.sql.dump
+*.dump
+*.bak
+*.backup
+/database-dumps/
+/db-dumps/
+/backups/

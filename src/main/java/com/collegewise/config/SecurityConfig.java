@@ -21,8 +21,10 @@ public class SecurityConfig {
                 .sessionManagement(session->session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .exceptionHandling(errors->errors
                         .authenticationEntryPoint((request,response,exception)->{response.setStatus(401);response.setContentType("application/json");response.getWriter().write("{\"error\":\"Unauthorized\"}");})
-                        .accessDeniedHandler((request,response,exception)->{response.setStatus(403);response.setContentType("application/json");response.getWriter().write("{\"error\":\"Forbidden\"}");}))
+                .accessDeniedHandler((request,response,exception)->{response.setStatus(403);response.setContentType("application/json");response.getWriter().write("{\"error\":\"Forbidden\"}");}))
                 .authorizeHttpRequests(auth->auth
+                        .requestMatchers("/admin.html").hasRole("ADMIN")
+                        .requestMatchers("/dashboard.html").hasRole("STUDENT")
                         .requestMatchers("/api/auth/register","/api/auth/login","/api/health","/","/*.html","/*.css","/*.js").permitAll()
                         .requestMatchers(HttpMethod.GET,"/api/colleges/**").permitAll()
                         .requestMatchers("/api/admin/**","/api/colleges/**").hasRole("ADMIN")

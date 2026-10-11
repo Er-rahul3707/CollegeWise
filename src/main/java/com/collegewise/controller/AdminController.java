@@ -35,14 +35,15 @@ public class AdminController {
     @GetMapping("/dashboard")
     Map<String,Long> dashboard() {
         return Map.of("students",users.countByRole(Role.STUDENT),"colleges",colleges.count(),
-                "courses",courses.count(),"branches",branches.count(),"cutoffs",cutoffs.count());
+                "courses",courses.count(),"branches",branches.count(),"cutoffs",cutoffs.count(),
+                "placements",placements.count(),"favorites",favorites.count(),"recommendations",recommendationHistory.count());
     }
 
     @GetMapping("/courses") Object listCourses(){return courses.findAll().stream().map(CourseResponse::from).toList();}
     @PostMapping("/courses") @ResponseStatus(HttpStatus.CREATED)
-    Object createCourse(@RequestBody Map<String,String> r){return CourseResponse.from(courses.save(new Course(required(r,"name"),r.get("description"))));}
+    Object createCourse(@RequestBody Map<String,String> r){return CourseResponse.from(courses.save(new Course(text(r,"name",100,true),text(r,"description",500,false))));}
     @PutMapping("/courses/{id}") Object updateCourse(@PathVariable Long id,@RequestBody Map<String,String> r){
-        Course c=courses.findById(id).orElseThrow(()->notFound("Course"));c.updateFrom(new Course(required(r,"name"),r.get("description")));return CourseResponse.from(c);
+        Course c=courses.findById(id).orElseThrow(()->notFound("Course"));c.updateFrom(new Course(text(r,"name",100,true),text(r,"description",500,false)));return CourseResponse.from(c);
     }
     @DeleteMapping("/courses/{id}") @ResponseStatus(HttpStatus.NO_CONTENT) void deleteCourse(@PathVariable Long id){Course c=courses.findById(id).orElseThrow(()->notFound("Course"));cutoffs.deleteByCourse(c);placements.deleteByCourse(c);courses.delete(c);}
 
@@ -88,13 +89,14 @@ public class AdminController {
         user.setActive(active);return UserResponse.from(users.save(user));
     }
 
-    private Branch branchFrom(Map<String,String> r){College college=colleges.findById(Long.valueOf(required(r,"collegeId"))).orElseThrow(()->notFound("College"));return new Branch(college,required(r,"name"),r.get("description"));}
-    private Cutoff cutoffFrom(Map<String,String> r){College college=colleges.findById(Long.valueOf(required(r,"collegeId"))).orElseThrow(()->notFound("College"));Course course=optionalCourse(r);Branch branch=optionalBranch(r);if(branch!=null&&!branch.getCollege().getId().equals(college.getId()))throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"Branch must belong to the selected college");String exam=required(r,"entranceExam");int year=Integer.valueOf(required(r,"examYear"));if(year<2000||year>2100)throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"examYear must be between 2000 and 2100");Integer rank=integer(r.get("closingRank"));Double percentile=decimal(r.get("closingPercentile"));if(rank!=null&&rank<1)throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"closingRank must be positive");if(percentile!=null&&(percentile<0||percentile>100))throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"closingPercentile must be between 0 and 100");if(rank==null&&percentile==null)throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"A closing rank or percentile is required");return new Cutoff(college,course,branch,exam,year,r.get("category"),rank,percentile);}
+    private Branch branchFrom(Map<String,String> r){College college=colleges.findById(Long.valueOf(required(r,"collegeId"))).orElseThrow(()->notFound("College"));return new Branch(college,text(r,"name",100,true),text(r,"description",500,false));}
+    private Cutoff cutoffFrom(Map<String,String> r){College college=colleges.findById(Long.valueOf(required(r,"collegeId"))).orElseThrow(()->notFound("College"));Course course=optionalCourse(r);Branch branch=optionalBranch(r);if(branch!=null&&!branch.getCollege().getId().equals(college.getId()))throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"Branch must belong to the selected college");String exam=text(r,"entranceExam",50,true);int year=Integer.valueOf(required(r,"examYear"));if(year<2000||year>2100)throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"examYear must be between 2000 and 2100");Integer rank=integer(r.get("closingRank"));Double percentile=decimal(r.get("closingPercentile"));if(rank!=null&&rank<1)throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"closingRank must be positive");if(percentile!=null&&(percentile<0||percentile>100))throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"closingPercentile must be between 0 and 100");if(rank==null&&percentile==null)throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"A closing rank or percentile is required");return new Cutoff(college,course,branch,exam,year,text(r,"category",40,false),rank,percentile);}
     private Placement placementFrom(Map<String,String> r){College college=colleges.findById(Long.valueOf(required(r,"collegeId"))).orElseThrow(()->notFound("College"));int year=Integer.valueOf(required(r,"year")),placed=Integer.valueOf(required(r,"studentsPlaced")),eligible=Integer.valueOf(required(r,"studentsEligible"));double average=Double.valueOf(required(r,"averagePackage")),highest=Double.valueOf(required(r,"highestPackage"));if(year<2000||year>2100||eligible<1||placed<0||placed>eligible||average<0||highest<average)throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"Placement year, totals, and package values are inconsistent");return new Placement(college,optionalCourse(r),year,placed,eligible,average,highest);}
     private Course optionalCourse(Map<String,String> r){return r.get("courseId")==null||r.get("courseId").isBlank()?null:courses.findById(Long.valueOf(r.get("courseId"))).orElseThrow(()->notFound("Course"));}
     private Branch optionalBranch(Map<String,String> r){return r.get("branchId")==null||r.get("branchId").isBlank()?null:branches.findById(Long.valueOf(r.get("branchId"))).orElseThrow(()->notFound("Branch"));}
     private College collegeFrom(CollegeRequest r){return new College(r.name(),r.description(),r.state(),r.city(),r.address(),r.website(),r.collegeType(),r.establishedYear(),r.fees(),r.ranking(),Boolean.TRUE.equals(r.hostelAvailable()),r.accreditation(),r.imageUrl());}
     private String required(Map<String,String> r,String key){String value=r.get(key);if(value==null||value.isBlank())throw new ResponseStatusException(HttpStatus.BAD_REQUEST,key+" is required");return value.trim();}
+    private String text(Map<String,String> r,String key,int max,boolean required){String value=r.get(key);if(value==null||value.isBlank()){if(required)throw new ResponseStatusException(HttpStatus.BAD_REQUEST,key+" is required");return null;}value=value.trim();if(value.length()>max)throw new ResponseStatusException(HttpStatus.BAD_REQUEST,key+" must be at most "+max+" characters");return value;}
     private Integer integer(String s){return s==null||s.isBlank()?null:Integer.valueOf(s);}
     private Double decimal(String s){return s==null||s.isBlank()?null:Double.valueOf(s);}
     private ResponseStatusException notFound(String kind){return new ResponseStatusException(HttpStatus.NOT_FOUND,kind+" not found");}

@@ -1,4 +1,5 @@
-let page=0,token=localStorage.getItem('cw_token')||'',registerMode=false,compareIds=[];
+localStorage.removeItem('cw_token');
+let page=0,role=sessionStorage.getItem('cw_role')||'',registerMode=false,compareIds=[];
 const el=id=>document.getElementById(id);
 const esc=value=>String(value??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const money=value=>value==null?'Not listed':`₹${Number(value).toLocaleString('en-IN')}`;
@@ -25,7 +26,7 @@ function updateCompareTray(){
 }
 
 window.compareCollege=id=>{
-  if(!token){setMode(false);el('authError').textContent='Sign in to compare colleges.';bootstrap.Modal.getOrCreateInstance(el('authModal')).show();return}
+  if(role!=='STUDENT'){setMode(false);el('authError').textContent='Sign in to compare colleges.';bootstrap.Modal.getOrCreateInstance(el('authModal')).show();return}
   const index=compareIds.findIndex(item=>item.id===id);
   if(index>=0)compareIds.splice(index,1);
   else if(compareIds.length>=3){el('compareCount').textContent='Remove a college before adding another (maximum 3).';return}
@@ -33,16 +34,16 @@ window.compareCollege=id=>{
   updateCompareTray();
 };
 
-function setMode(register){registerMode=register;el('nameField').classList.toggle('d-none',!register);el('authTitle').textContent=register?'Create your account':'Welcome back';el('loginTab').classList.toggle('active',!register);el('registerTab').classList.toggle('active',register);el('authError').textContent=''}
+function setMode(register){registerMode=register;el('nameField').classList.toggle('d-none',!register);el('authForm').elements.name.required=register;el('authTitle').textContent=register?'Create your account':'Welcome back';el('loginTab').classList.toggle('active',!register);el('registerTab').classList.toggle('active',register);el('authError').textContent=''}
 el('loginTab').onclick=()=>setMode(false);el('registerTab').onclick=()=>setMode(true);
 document.querySelectorAll('[data-register]').forEach(button=>button.addEventListener('click',()=>setMode(true)));
 el('authForm').onsubmit=async event=>{
   event.preventDefault();const data=Object.fromEntries(new FormData(event.currentTarget));
   try{const response=await fetch(registerMode?'/api/auth/register':'/api/auth/login',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(data)});const result=await response.json();if(!response.ok)throw new Error(result.error||'Authentication failed. Check your details and try again.');
-    token=result.token;localStorage.setItem('cw_token',token);el('welcome').textContent=`Hi, ${result.name}`;el('authButton').textContent='Sign out';bootstrap.Modal.getOrCreateInstance(el('authModal')).hide();
+    role=result.role;sessionStorage.setItem('cw_role',role);sessionStorage.setItem('cw_name',result.name);location.assign(role==='ADMIN'?'/admin.html':'/dashboard.html');
   }catch(error){el('authError').textContent=error.message}
 };
-el('authButton').onclick=async event=>{if(!token)return;try{await fetch('/api/auth/logout',{method:'POST',headers:{Authorization:`Bearer ${token}`}})}finally{localStorage.removeItem('cw_token');token='';el('welcome').textContent='';event.currentTarget.textContent='Sign in';compareIds=[];updateCompareTray()}};
+el('authButton').onclick=async event=>{if(!role)return;const button=event.currentTarget;try{await fetch('/api/auth/logout',{method:'POST'})}finally{sessionStorage.removeItem('cw_role');sessionStorage.removeItem('cw_name');role='';el('welcome').textContent='';button.textContent='Sign in';button.setAttribute('data-bs-toggle','modal');button.setAttribute('data-bs-target','#authModal');compareIds=[];updateCompareTray()}};
 ['query','state','city','maxFees'].forEach(id=>el(id).addEventListener('input',()=>{page=0;loadColleges()}));
 ['hostel','sort'].forEach(id=>el(id).addEventListener('change',()=>{page=0;loadColleges()}));
 el('prev').onclick=()=>{page=Math.max(0,page-1);loadColleges()};el('next').onclick=()=>{page++;loadColleges()};
@@ -50,6 +51,7 @@ el('clearCompare').onclick=()=>{compareIds=[];updateCompareTray()};
 el('showCompare').onclick=showComparison;
 
 function makeCompareTable(colleges){
+  const latestPlacement=rows=>rows.reduce((latest,row)=>!latest||Number(row.year)>Number(latest.year)||(Number(row.year)===Number(latest.year)&&Number(row.id)>Number(latest.id))?row:latest,null);
   const metrics=[
     ['Location',college=>`${college.college.city}, ${college.college.state}`],
     ['College type',college=>college.college.collegeType],
@@ -58,9 +60,9 @@ function makeCompareTable(colleges){
     ['Hostel',college=>college.college.hostelAvailable?'Available':'Not listed'],
     ['Courses',college=>college.courses.map(row=>row.name).join(', ')],
     ['Branches',college=>college.branches.map(row=>row.name).join(', ')],
-    ['Latest average package',college=>{const placement=college.placements.at(-1);return placement?money(placement.averagePackage):'Not listed'}],
-    ['Latest highest package',college=>{const placement=college.placements.at(-1);return placement?money(placement.highestPackage):'Not listed'}],
-    ['Latest placement rate',college=>{const placement=college.placements.at(-1);return placement?.studentsEligible?`${Math.round(placement.studentsPlaced/placement.studentsEligible*100)}%`:'Not listed'}],
+    ['Latest average package',college=>{const placement=latestPlacement(college.placements);return placement?money(placement.averagePackage):'Not listed'}],
+    ['Latest highest package',college=>{const placement=latestPlacement(college.placements);return placement?money(placement.highestPackage):'Not listed'}],
+    ['Latest placement rate',college=>{const placement=latestPlacement(college.placements);return placement?.studentsEligible?`${Math.round(placement.studentsPlaced/placement.studentsEligible*100)}%`:'Not listed'}],
     ['Admission exams / closing ranks',college=>college.cutoffs.map(row=>`${row.entranceExam} ${row.examYear}: ${row.closingRank??`${row.closingPercentile}%`}`).join('; ')],
     ['Established',college=>college.college.establishedYear],
     ['Website',college=>college.college.website]
@@ -74,9 +76,9 @@ function makeCompareTable(colleges){
 async function showComparison(){
   if(compareIds.length<2)return;el('comparisonResult').replaceChildren();el('comparisonLoading').textContent='Loading comparison…';
   bootstrap.Modal.getOrCreateInstance(el('compareModal')).show();
-  try{const details=await Promise.all(compareIds.map(async item=>{const response=await fetch(`/api/colleges/${item.id}/details`,{headers:{Authorization:`Bearer ${token}`}});if(!response.ok)throw new Error('Unable to load comparison details. Please retry.');return response.json()}));makeCompareTable(details);el('comparisonLoading').textContent='Demo fees, placements and cutoff values are illustrative estimates.'}
+  try{const details=await Promise.all(compareIds.map(async item=>{const response=await fetch(`/api/colleges/${item.id}/details`);if(!response.ok)throw new Error('Unable to load comparison details. Please retry.');return response.json()}));makeCompareTable(details);el('comparisonLoading').textContent='Demo fees, placements and cutoff values are illustrative estimates.'}
   catch(error){el('comparisonLoading').textContent=error.message}
 }
 
-if(token){el('welcome').textContent='Signed in';el('authButton').textContent='Sign out'}
+if(role){el('welcome').textContent=`Hi, ${sessionStorage.getItem('cw_name')||'there'}`;el('authButton').textContent='Sign out';el('authButton').removeAttribute('data-bs-toggle');el('authButton').removeAttribute('data-bs-target')}
 loadColleges();

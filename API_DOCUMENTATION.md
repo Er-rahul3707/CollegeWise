@@ -5,14 +5,16 @@ JSON APIs are rooted at `/api`. Use `Authorization: Bearer <token>` for authenti
 ## Authentication
 
 - `POST /auth/register` `{ "name": "A Student", "email": "student@example.com", "password": "at-least-12-chars" }`
-- `POST /auth/login` `{ "email": "student@example.com", "password": "..." }` → bearer token, role, display name
-- `POST /auth/logout` → client discards token; no server-side revocation
+- `POST /auth/login` `{ "email": "student@example.com", "password": "..." }` → bearer token, role, display name; browser clients also receive an `HttpOnly`, `SameSite=Strict` cookie
+- `POST /auth/logout` → clears the browser cookie; bearer tokens are stateless and are not server-revoked before expiry
+- Browser navigation to `/dashboard.html` requires a student cookie; `/admin.html` requires an admin cookie. The role checks are enforced by Spring Security, not by the UI's display state.
 
 ## Discovery
 
 - `GET /colleges?page=0&size=12&q=tech&state=Karnataka&city=Bengaluru&maxFees=250000&hostel=true&sort=fees`
 - `GET /colleges/search?q=engineering&page=0&size=12`
 - `GET /colleges/{id}`
+- `GET /colleges/{id}/details` (college plus courses, branches, cutoff examples, and placement rows)
 - Admin: `POST|PUT|DELETE /colleges...` and `/admin/colleges...`
 
 ## Student

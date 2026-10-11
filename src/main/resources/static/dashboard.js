@@ -1,12 +1,11 @@
-const token=localStorage.getItem('cw_token');
+localStorage.removeItem('cw_token');
 const $=id=>document.getElementById(id);
-const headers={'Authorization':`Bearer ${token}`,'Content-Type':'application/json'};
+const headers={'Content-Type':'application/json'};
 const message=$('message');
-document.getElementById('logout').onclick=async()=>{try{await fetch('/api/auth/logout',{method:'POST',headers:{Authorization:`Bearer ${token}`}})}finally{localStorage.removeItem('cw_token');location.href='/'}};
+document.getElementById('logout').onclick=async()=>{try{await fetch('/api/auth/logout',{method:'POST'})}finally{sessionStorage.removeItem('cw_role');sessionStorage.removeItem('cw_name');location.href='/'}};
 const safe=value=>String(value??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 
-if(!token)message.innerHTML='Please <a href="/">sign in</a> to view your student dashboard.';
-else start();
+start();
 
 async function api(path,options={}){
   const response=await fetch('/api'+path,{...options,headers:{...headers,...options.headers}});
@@ -78,6 +77,7 @@ $('compare').onclick=async()=>{
 };
 
 function renderComparison(colleges,output){
+  const latestPlacement=rows=>rows.reduce((latest,row)=>!latest||Number(row.year)>Number(latest.year)||(Number(row.year)===Number(latest.year)&&Number(row.id)>Number(latest.id))?row:latest,null);
   const rows=[
     ['Location',item=>`${item.college.city}, ${item.college.state}`],
     ['Fees',item=>item.college.fees==null?'Not listed':`₹${Number(item.college.fees).toLocaleString('en-IN')}`],
@@ -85,8 +85,8 @@ function renderComparison(colleges,output){
     ['Hostel',item=>item.college.hostelAvailable?'Available':'Not listed'],
     ['Courses',item=>item.courses.map(row=>row.name).join(', ')||'Not listed'],
     ['Branches',item=>item.branches.map(row=>row.name).join(', ')||'Not listed'],
-    ['Average placement',item=>item.placements.length?`₹${Number(item.placements.at(-1).averagePackage).toLocaleString('en-IN')}`:'Not listed'],
-    ['Highest placement',item=>item.placements.length?`₹${Number(item.placements.at(-1).highestPackage).toLocaleString('en-IN')}`:'Not listed'],
+    ['Average placement',item=>{const placement=latestPlacement(item.placements);return placement?.averagePackage==null?'Not listed':`₹${Number(placement.averagePackage).toLocaleString('en-IN')}`}],
+    ['Highest placement',item=>{const placement=latestPlacement(item.placements);return placement?.highestPackage==null?'Not listed':`₹${Number(placement.highestPackage).toLocaleString('en-IN')}`}],
     ['Admission cutoffs',item=>item.cutoffs.map(row=>`${row.entranceExam} ${row.examYear}: ${row.closingRank??row.closingPercentile}`).join('; ')||'Not listed']
   ];
   const table=document.createElement('table');table.className='table table-bordered align-middle comparison-table';table.setAttribute('aria-label','College comparison');
