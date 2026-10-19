@@ -11,6 +11,8 @@
 [![Bootstrap 5](https://img.shields.io/badge/Bootstrap-5-7952B3?logo=bootstrap&logoColor=white)](https://getbootstrap.com/)
 [![Vanilla JavaScript](https://img.shields.io/badge/JavaScript-Vanilla-F7DF1E?logo=javascript&logoColor=black)](https://developer.mozilla.org/docs/Web/JavaScript)
 
+[GitHub repository](https://github.com/Er-rahul3707/CollegeWise) · [Java release branch](https://github.com/Er-rahul3707/CollegeWise/tree/release/java-spring-boot) · [Maven workflow](https://github.com/Er-rahul3707/CollegeWise/blob/release/java-spring-boot/.github/workflows/maven.yml)
+
 CollegeWise is a Java full-stack capstone that helps students explore engineering colleges, compare options, save a shortlist, and review recommendations based on their academic and location preferences. Spring Boot serves the REST API and the HTML/CSS/Bootstrap/vanilla JavaScript frontend from one application.
 
 > **Demo-data notice:** catalogue rankings, fees, cutoff values, and placement statistics are illustrative. Recommendation scores are explainable rule-based fit guidance, not admission probabilities or guarantees. Confirm current information with the institution.
@@ -142,7 +144,7 @@ mvn clean package
 mvn spring-boot:run
 ```
 
-The default application URL is [http://localhost:8080](http://localhost:8080). To run the packaged application instead:
+When the app is running locally, open `http://localhost:8080/`; its health check is `http://localhost:8080/api/health`. These loopback URLs work only on the computer running the application. This repository has no verified public deployment. To run the packaged application instead:
 
 ```powershell
 java -jar target\collegewise-1.0.0.jar
@@ -154,11 +156,11 @@ Do not change or reset an existing database to try the demo. Use a separate loca
 
 **Student:** Open the home page, choose Sign in, and register a new student account. Registration creates a student role only. Sign in to reach `/dashboard.html`, complete the profile, and use the recommendation, saved-college, and comparison features.
 
-**Administrator:** There are no shipped admin credentials. Follow the masked Windows setup in [SETUP_GUIDE.md](SETUP_GUIDE.md) to configure `ADMIN_EMAIL` and `ADMIN_PASSWORD` before first startup. The bootstrap hashes the supplied password and does not reset an existing account. Sign in at [`/admin-login.html`](http://localhost:8080/admin-login.html); protected operations are checked server-side.
+**Administrator:** There are no shipped admin credentials. Follow the masked Windows setup in [SETUP_GUIDE.md](SETUP_GUIDE.md) to configure `ADMIN_EMAIL` and `ADMIN_PASSWORD` before first startup. The bootstrap hashes the supplied password and does not reset an existing account. When the application is running locally, sign in at `/admin-login.html`; protected operations are checked server-side.
 
 ## API and health check
 
-API routes are rooted under `/api`. The health check is [`GET /api/health`](http://localhost:8080/api/health). Public catalogue endpoints support listing, search, filters, sorting, and details. Authenticated student routes cover profile, dashboard, recommendations/history, favorites, and comparison. Admin routes cover dashboard statistics and managed records. See [API_DOCUMENTATION.md](API_DOCUMENTATION.md) for route details and [POSTMAN_COLLECTION.json](POSTMAN_COLLECTION.json) for request examples.
+API routes are rooted under `/api`. The health check is `GET /api/health` (at `http://localhost:8080/api/health` only while the application is running locally). Public catalogue endpoints support listing, search, filters, sorting, and details. Authenticated student routes cover profile, dashboard, recommendations/history, favorites, and comparison. Admin routes cover dashboard statistics and managed records. See [API_DOCUMENTATION.md](API_DOCUMENTATION.md) for route details and [POSTMAN_COLLECTION.json](POSTMAN_COLLECTION.json) for request examples.
 
 ## Tests
 
