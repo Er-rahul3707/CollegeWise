@@ -38,3 +38,10 @@ No application source or account data in the configured `collegewise` schema was
 - **Data scope: PASS.** Only `collegewise_test` was used for these live changes. The production/application `collegewise` schema was not used. The test schema and its disposable account/catalogue were removed after the audit; the configured `collegewise` schema remains untouched. Never point demo CRUD checks at production.
 
 The browser used the local Spring Boot app at `http://localhost:8082`. Screenshots and mobile-specific rendering are not part of this automated report.
+
+## Release validation — 2026-10-19
+
+- **`mvn clean test`: PASS.** 15 tests ran with 0 failures, 0 errors, and 0 skips on the isolated in-memory H2 database: 10 API contract tests, 1 API integration test, 2 JWT service tests, and 2 recommendation service tests.
+- **`mvn clean package`: PASS.** The clean package run repeated all 15 tests successfully and produced the Spring Boot executable JAR.
+- The historical audit entries above record earlier 14-test runs; the current count is 15 after the authentication contract coverage was expanded. No tests were removed or weakened to obtain this result.
+- This release validation used H2 for automated tests. It does not constitute a new live MySQL startup or a full browser end-to-end run.

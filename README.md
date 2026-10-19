@@ -1,226 +1,195 @@
 # CollegeWise — Smart College Comparison & Career Guidance System
 
-**Developed by Rahul Chandra Sharma & Team**
+**Author of the project concept and current Java Spring Boot capstone implementation: Rahul Chandra Sharma**
 
 [![Java 17](https://img.shields.io/badge/Java-17-ED8B00?logo=openjdk&logoColor=white)](https://www.oracle.com/java/technologies/javase/jdk17-archive-downloads.html)
 [![Spring Boot 3.3.5](https://img.shields.io/badge/Spring%20Boot-3.3.5-6DB33F?logo=springboot&logoColor=white)](https://spring.io/projects/spring-boot)
 [![Maven](https://img.shields.io/badge/Build-Maven-C71A36?logo=apachemaven&logoColor=white)](https://maven.apache.org/)
-[![MySQL 8](https://img.shields.io/badge/Database-MySQL%208-4479A1?logo=mysql&logoColor=white)](https://www.mysql.com/)
-[![CI](https://github.com/Er-rahul3707/CollegeWise/actions/workflows/maven.yml/badge.svg?branch=main)](https://github.com/Er-rahul3707/CollegeWise/actions/workflows/maven.yml)
+[![MySQL 8+](https://img.shields.io/badge/Database-MySQL%208%2B-4479A1?logo=mysql&logoColor=white)](https://www.mysql.com/)
 [![HTML5](https://img.shields.io/badge/HTML5-E34F26?logo=html5&logoColor=white)](https://developer.mozilla.org/docs/Web/HTML)
 [![CSS3](https://img.shields.io/badge/CSS3-1572B6?logo=css3&logoColor=white)](https://developer.mozilla.org/docs/Web/CSS)
 [![Bootstrap 5](https://img.shields.io/badge/Bootstrap-5-7952B3?logo=bootstrap&logoColor=white)](https://getbootstrap.com/)
 [![Vanilla JavaScript](https://img.shields.io/badge/JavaScript-Vanilla-F7DF1E?logo=javascript&logoColor=black)](https://developer.mozilla.org/docs/Web/JavaScript)
 
-CollegeWise is a Java full-stack capstone for exploring Indian engineering colleges. Students can filter a seeded catalogue, compare colleges, save favorites, and review explainable profile-fit recommendations. Spring Boot serves both the REST API and the static HTML/CSS/JavaScript interface from one application.
+CollegeWise is a Java full-stack capstone that helps students explore engineering colleges, compare options, save a shortlist, and review recommendations based on their academic and location preferences. Spring Boot serves the REST API and the HTML/CSS/Bootstrap/vanilla JavaScript frontend from one application.
 
-> Fees, placement values, rankings, and cutoffs in the demonstration catalogue are illustrative. Recommendation scores are rule-based fit guidance and are not admission probabilities or guarantees. Confirm current information with each institution.
-
-## Project documentation
-
-| Guide | What it covers |
-| --- | --- |
-| [Setup guide](SETUP_GUIDE.md) | Windows setup, MySQL, environment variables, run instructions |
-| [Architecture](PROJECT_ARCHITECTURE.md) | Application components and request flow |
-| [API documentation](API_DOCUMENTATION.md) | REST routes, authentication, and examples |
-| [Database schema](DATABASE_SCHEMA.md) | JPA entities and relationships |
-| [Recommendation algorithm](RECOMMENDATION_ALGORITHM.md) | Rule-based score factors and limits |
-| [Testing guide](TESTING.md) | Automated checks and verified audit scope |
+> **Demo-data notice:** catalogue rankings, fees, cutoff values, and placement statistics are illustrative. Recommendation scores are explainable rule-based fit guidance, not admission probabilities or guarantees. Confirm current information with the institution.
 
 ## Contents
 
-- [Project documentation](#project-documentation)
-- [Features](#features)
-- [Technology](#technology)
-- [Architecture](#architecture)
-- [Student journey](#student-journey)
+- [Problem and objectives](#problem-and-objectives)
+- [Features and user roles](#features-and-user-roles)
+- [Technology stack](#technology-stack)
+- [Architecture and workflow](#architecture-and-workflow)
+- [Application screenshots](#application-screenshots)
 - [Recommendation method and limits](#recommendation-method-and-limits)
-- [Data model](#data-model)
-- [Project structure](#project-structure)
-- [Requirements](#requirements)
-- [Setup and run on Windows](#setup-and-run-on-windows)
-- [Demo accounts](#demo-accounts)
-- [API reference](#api-reference)
-- [Verification](#verification)
-- [Screenshots](#screenshots)
-- [Security notes](#security-notes)
-- [Limitations and future work](#limitations-and-future-work)
-- [Troubleshooting](#troubleshooting)
-- [Contributing](#contributing)
-- [Attribution](#attribution)
-- [License](#license)
+- [Database and configuration](#database-and-configuration)
+- [Run locally on Windows](#run-locally-on-windows)
+- [Student and admin access](#student-and-admin-access)
+- [API and health check](#api-and-health-check)
+- [Tests](#tests)
+- [Documentation](#documentation)
+- [Limitations and future enhancements](#limitations-and-future-enhancements)
+- [Attribution and licensing](#attribution-and-licensing)
 
-## Features
+## Problem and objectives
 
-| Area | Implemented capabilities |
+Students often have to compare college options across separate sources for location, fees, courses, entrance cutoffs, and placement information. CollegeWise brings these catalogue fields into one searchable view and provides a consistent way to compare options.
+
+The capstone objectives are to:
+
+- provide searchable college and course information;
+- let students save and compare a shortlist;
+- use a student profile to produce explainable recommendation matches;
+- protect student and administrator operations with role-based authentication; and
+- demonstrate a layered Java, Spring Boot, JPA, and MySQL application with a browser frontend.
+
+## Features and user roles
+
+| Role | Capabilities |
 | --- | --- |
-| Student access | Registration, login, logout, BCrypt password storage, JWT authentication, HttpOnly browser cookie, profile retrieval and update |
-| College discovery | Paginated listing, text search, state/city, fee and hostel filters, sorting, detail view |
-| Planning | Explainable recommendations and history, favorites, comparison of two or three colleges |
-| Administration | Role-protected dashboard and college, course, branch, cutoff and placement CRUD; user listing and active-state management |
-| Demo data | Idempotent sample catalogue with 20 colleges and related course, branch, cutoff and placement data |
-| Interface | HTML5, CSS3, Bootstrap 5 and vanilla JavaScript, served as Spring Boot static resources |
+| Public visitor | Browse, search, filter, sort, and view the seeded college catalogue and college details. |
+| Student | Register and sign in; maintain academic and preference details; view recommendations and history; add or remove favorites; compare two or three colleges. |
+| Administrator | Sign in through the admin login page; access protected dashboard and manage colleges, courses, branches, cutoffs, placements, and user active status. |
 
-The feature list describes available capabilities; the verification summary below distinguishes automated tests, live API checks, and browser workflows.
+The sample catalogue is initialized idempotently. There are no default student or administrator passwords. Admin provisioning is controlled by environment variables and creates an account only when the configured email is not already present.
 
-## Technology
+## Technology stack
 
 - **Frontend:** HTML5, CSS3, Bootstrap 5, vanilla JavaScript
 - **Backend:** Java 17, Spring Boot 3.3.5, Spring MVC, Spring Security, Spring Data JPA, Hibernate, Jakarta Validation
-- **Authentication:** JWT, BCrypt, HttpOnly and SameSite cookie for browser sessions
-- **Application database:** MySQL 8+ with MySQL Connector/J
-- **Automated test database:** H2, test scope only
+- **Authentication:** JWT, BCrypt password hashing, HttpOnly/SameSite browser cookie
+- **Application database:** MySQL 8+
+- **Automated test database:** H2, used only by tests
 - **Build:** Maven
 
-The running application does not need Node.js or a separate frontend server. The repository retains legacy project material under `backend/`; it is not used to run the Spring Boot application.
+The app does not require Node.js or a separate frontend server at runtime.
 
-## Architecture
+## Architecture and workflow
 
 ```mermaid
 flowchart LR
-    B[Browser: HTML, CSS, Bootstrap, JavaScript] -->|same-origin HTTP and JSON| S[Spring Security and JWT filter]
-    S --> C[Spring MVC controllers and validated DTOs]
-    C --> V[Services and business rules]
-    V --> R[Spring Data JPA repositories]
-    R --> H[Hibernate ORM]
-    H --> M[(MySQL)]
-    C -->|packaged static resources| B
+    UI[Browser UI<br/>HTML, CSS, Bootstrap, JavaScript] -->|same-origin HTTP/JSON| SEC[Spring Security<br/>JWT filter and role checks]
+    SEC --> API[Spring MVC controllers<br/>validated request DTOs]
+    API --> SVC[Services and business rules]
+    SVC --> REPO[Spring Data JPA repositories]
+    REPO --> ORM[Hibernate]
+    ORM --> DB[(MySQL 8+)]
+    API -->|static resources and JSON responses| UI
 ```
 
-Spring Boot is the single application process. Controllers expose DTOs, services apply application rules, repositories access persisted data, and Hibernate maps entities to MySQL. H2 is configured only in the test resources.
+The browser calls the same-origin REST API. Controllers validate and map requests, services apply application rules, repositories access persisted data, and Hibernate maps entities to MySQL. Spring Security distinguishes student and admin authorities; hiding a button in the frontend is not the authorization boundary.
 
-## Student journey
+Main entities include `User`, `StudentProfile`, `College`, `Course`, `Branch`, `Cutoff`, `Placement`, `Favorite`, and `RecommendationHistory`. Relationship details are in [DATABASE_SCHEMA.md](DATABASE_SCHEMA.md).
 
-```mermaid
-flowchart TD
-    A[Explore catalogue] --> B[Register or sign in]
-    B --> C[Complete academic and preference profile]
-    C --> D[Search and filter colleges]
-    C --> E[Generate recommendations]
-    D --> F[Open college details]
-    E --> F
-    F --> G[Save favorites]
-    F --> H[Compare 2 or 3 colleges]
-    E --> I[Review recommendation history]
-    G --> J[Student dashboard]
-    H --> J
-    I --> J
-```
+## Application screenshots
+
+These are genuine application captures. Captions describe the actual visible screen.
+
+### Homepage
+
+![CollegeWise homepage](docs/screenshots/01-homepage.png)
+
+### Explore colleges
+
+![College search and catalogue filters](docs/screenshots/02-explore-colleges.png)
+
+### Recommendations and comparison selector
+
+![Recommendation results with the compare selector](docs/screenshots/04-college-recommendations.png)
+
+### Saved colleges and recommendation history
+
+![Saved college list and recommendation history](docs/screenshots/05-saved-colleges.png)
+
+### College comparison
+
+![Side-by-side college comparison](docs/screenshots/06-college-comparison.png)
+
+### Admin dashboard
+
+![Administrator dashboard](docs/screenshots/07-admin-dashboard.png)
+
+The available student-dashboard capture is not included in this public gallery because it contains identifiable student profile and academic information. Replace it with a fresh capture using non-personal test data before publishing a dashboard image.
 
 ## Recommendation method and limits
 
-Recommendations use deterministic, rule-based scoring from profile and catalogue fields. Factors include affordability, preferred state/city, course and branch compatibility, hostel preference, ranking, comparable entrance cutoff, and available placement outcomes. The current scoring weights and compatibility statuses are documented in [RECOMMENDATION_ALGORITHM.md](RECOMMENDATION_ALGORITHM.md).
+Recommendations use deterministic, rule-based scoring from modeled profile and catalogue fields. Factors include budget, location, course and branch, hostel preference, ranking, comparable entrance cutoff, and available placement outcomes. Each result reports contributing reasons and cutoff compatibility when comparable evidence exists. Weights and compatibility behavior are documented in [RECOMMENDATION_ALGORITHM.md](RECOMMENDATION_ALGORITHM.md).
 
-The result is a screening aid, not a machine-learning model or an admission chance estimate. Missing or non-comparable cutoff information is reported as insufficient data. The system does not score school percentages against eligibility criteria because that data is not modeled. Catalogue values and cutoffs are demo data and need institution-level verification.
+The score is not an admission chance. Missing or non-comparable cutoff evidence is reported as insufficient data. School percentages are not used as eligibility evidence because the current model does not represent institution-specific eligibility rules. Demo data should be validated before making decisions.
 
-## Data model
+## Database and configuration
 
-The main entities are `User`, `StudentProfile`, `College`, `Course`, `Branch`, `Cutoff`, `Placement`, `Favorite`, and `RecommendationHistory`. A college has branches and related cutoff/placement records; student-owned favorites and recommendation history are associated with a user. See [DATABASE_SCHEMA.md](DATABASE_SCHEMA.md) for the relationship details.
+Install Java 17, Maven 3.9+, and MySQL 8+. Create a local schema and database user using the SQL in [SETUP_GUIDE.md](SETUP_GUIDE.md). Set these environment variables before starting the application:
 
-## Project structure
+| Variable | Purpose |
+| --- | --- |
+| `DB_URL` | MySQL JDBC URL, for example `jdbc:mysql://localhost:3306/collegewise` |
+| `DB_USERNAME` | Local MySQL application username |
+| `DB_PASSWORD` | Local MySQL password |
+| `JWT_SECRET` | Random signing key of at least 32 bytes |
+| `ADMIN_EMAIL`, `ADMIN_PASSWORD` | Optional first-time local admin bootstrap |
 
-```text
-src/main/java/com/collegewise/      Spring Boot application, API, security, services, entities
-src/main/resources/static/          HTML, CSS, and browser JavaScript served by Spring Boot
-src/main/resources/                  MySQL runtime configuration and demo data
-src/test/java/com/collegewise/       API, security, and recommendation tests
-src/test/resources/                  Isolated H2 test configuration
-backend/                             Retained legacy Node project files; not used at runtime
-API_DOCUMENTATION.md                 REST endpoint summary
-SETUP_GUIDE.md                       Windows, MySQL, configuration, and run instructions
-TESTING.md                           Commands and recorded verification results
-DATABASE_SCHEMA.md                   Entity and relationship overview
-PROJECT_ARCHITECTURE.md              Additional architecture notes
-RECOMMENDATION_ALGORITHM.md          Scoring factors and limitations
+Spring Boot does not automatically read `.env`; `.env.example` contains placeholders only. Store real values in Windows environment variables or another protected local configuration. Never commit credentials. Runtime uses MySQL. H2 is isolated to the test classpath.
+
+## Run locally on Windows
+
+After setting `DB_URL`, `DB_USERNAME`, `DB_PASSWORD`, and `JWT_SECRET` as described in [SETUP_GUIDE.md](SETUP_GUIDE.md), open a **new** PowerShell window in the repository root and run:
+
+```powershell
+mvn clean test
+mvn clean package
+mvn spring-boot:run
 ```
 
-## Requirements
+The default application URL is [http://localhost:8080](http://localhost:8080). To run the packaged application instead:
 
-- JDK 17
-- Maven 3.9 or later
-- MySQL 8 or later
-- Windows PowerShell or Command Prompt
+```powershell
+java -jar target\collegewise-1.0.0.jar
+```
 
-## Setup and run on Windows
+Do not change or reset an existing database to try the demo. Use a separate local test schema for destructive CRUD verification.
 
-1. Create a local MySQL schema and application user as described in [SETUP_GUIDE.md](SETUP_GUIDE.md).
-2. Configure `DB_URL`, `DB_USERNAME`, `DB_PASSWORD`, and a random `JWT_SECRET` of at least 32 bytes. Spring Boot does not load `.env` automatically. Keep secret values in Windows environment variables and do not commit them.
-3. Open a new terminal so it receives the configured variables. From the repository root:
+## Student and admin access
 
-   ```powershell
-   mvn clean test
-   mvn clean package
-   mvn spring-boot:run
-   ```
+**Student:** Open the home page, choose Sign in, and register a new student account. Registration creates a student role only. Sign in to reach `/dashboard.html`, complete the profile, and use the recommendation, saved-college, and comparison features.
 
-4. Open [http://localhost:8080](http://localhost:8080). The health endpoint is [http://localhost:8080/api/health](http://localhost:8080/api/health).
+**Administrator:** There are no shipped admin credentials. Follow the masked Windows setup in [SETUP_GUIDE.md](SETUP_GUIDE.md) to configure `ADMIN_EMAIL` and `ADMIN_PASSWORD` before first startup. The bootstrap hashes the supplied password and does not reset an existing account. Sign in at [`/admin-login.html`](http://localhost:8080/admin-login.html); protected operations are checked server-side.
 
-For a packaged start, run `java -jar target\collegewise-1.0.0.jar` after setting the same environment variables. See [SETUP_GUIDE.md](SETUP_GUIDE.md) for complete PowerShell and Command Prompt setup, test-schema instructions, and troubleshooting. Runtime uses MySQL; the application does not silently fall back to H2.
+## API and health check
 
-## Demo accounts
+API routes are rooted under `/api`. The health check is [`GET /api/health`](http://localhost:8080/api/health). Public catalogue endpoints support listing, search, filters, sorting, and details. Authenticated student routes cover profile, dashboard, recommendations/history, favorites, and comparison. Admin routes cover dashboard statistics and managed records. See [API_DOCUMENTATION.md](API_DOCUMENTATION.md) for route details and [POSTMAN_COLLECTION.json](POSTMAN_COLLECTION.json) for request examples.
 
-There are no default credentials. Student registration creates a student account. A local demo student can be provisioned only with the `demo` Spring profile and the documented `DEMO_STUDENT_EMAIL` / `DEMO_STUDENT_PASSWORD` variables. Admin bootstrap uses `ADMIN_EMAIL` / `ADMIN_PASSWORD`. Bootstrap creates an account only if the email is new and does not reset existing passwords. Follow the masked password setup in [SETUP_GUIDE.md](SETUP_GUIDE.md); never put actual passwords in source, chat, or Git.
+## Tests
 
-## API reference
+Run the automated tests and package build from the repository root:
 
-JSON endpoints are rooted under `/api`; see [API_DOCUMENTATION.md](API_DOCUMENTATION.md) for the endpoint list and [POSTMAN_COLLECTION.json](POSTMAN_COLLECTION.json) for request examples. Public endpoints include health and college discovery. Student and admin routes require authentication, with administrator routes restricted by server-side role checks.
+```powershell
+mvn clean test
+mvn clean package
+```
 
-## Verification
+Tests use in-memory H2 and do not by themselves establish live MySQL connectivity. [TESTING.md](TESTING.md) describes the test scope and the latest observed audit results. Frontend source files are served by Spring Boot; JavaScript syntax can be checked with `node --check` when Node.js is available for development, but Node.js is not required to run the application.
 
-The latest release audit (2026-10-12) recorded the following results:
+## Documentation
 
-- **Automated tests: PASS.** `mvn clean test` ran 14 tests with zero failures, errors, or skips using isolated in-memory H2.
-- **Package build: PASS.** `mvn clean package` completed successfully.
-- **Frontend syntax: PASS.** `node --check` passed for `app.js`, `dashboard.js`, `college.js`, and `admin.js`.
-- **MySQL: PASS.** The packaged application initialized schema and seed data in a temporary local `collegewise_test` schema and returned HTTP 200 from `/api/health`. The configured `collegewise` schema was not used for test writes; the temporary schema was removed afterward.
-- **Student browser workflow: PASS.** Registration, login/logout, profile updates, recommendations and reasons, history, favorites, college details, search/filters, and comparison of up to three colleges were exercised in the local browser.
-- **Admin workflow: PARTIAL.** Admin sign-in, dashboard, and create/edit flows for colleges, courses, branches, cutoffs, and placements were exercised. The actual UI Delete click was not; protected delete and related-record cleanup are covered by an automated regression test.
-- **Responsive check: PARTIAL.** The browser showed no horizontal overflow at a 714-pixel viewport. A dedicated phone-width viewport was not tested.
+- [Setup guide](SETUP_GUIDE.md) — Windows, MySQL, environment variables, accounts, and startup
+- [Architecture](PROJECT_ARCHITECTURE.md) — application structure and request flow
+- [API documentation](API_DOCUMENTATION.md) — authentication and REST routes
+- [Database schema](DATABASE_SCHEMA.md) — JPA entities and relationships
+- [Recommendation algorithm](RECOMMENDATION_ALGORITHM.md) — score factors and limits
+- [Testing guide](TESTING.md) — automated and integration verification
 
-See [TESTING.md](TESTING.md) for the detailed scope. Demo catalogue values are illustrative; scores are not admission probabilities or guarantees.
-## Screenshots
-
-No application screenshots are checked into this repository (the tracked SVG is only the favicon). Add genuine screenshots only after capturing the running application; do not use mockups as evidence of tested behavior.
-
-## Security notes
-
-- Runtime credentials and JWT signing material come from environment variables; `.env` and local credential files are ignored.
-- Passwords are stored with BCrypt and are not returned by the API.
-- Browser authentication uses an HttpOnly, SameSite cookie. JavaScript does not read the authentication cookie; the UI stores only display name/role in tab storage.
-- API clients can also use the bearer token returned on login. Stateless bearer tokens cannot be revoked before expiry; browser logout clears the browser cookie.
-- Tests use isolated H2. Live CRUD checks must use a separate local test schema, never production data.
-
-## Limitations and future work
+## Limitations and future enhancements
 
 - Email verification, password reset, refresh tokens, and server-side token revocation are not implemented.
-- Catalogue ranking, fees, cutoffs, and placement figures are illustrative; an institution may change them.
-- The recommendation score is rule-based and does not predict admission outcomes.
-- The admin Delete button has not been clicked in the browser, and a dedicated phone-width layout check remains outstanding; see [Verification](#verification).
-- Hibernate schema update is suitable for this capstone, not a production migration strategy; production deployment should use reviewed database migrations and operational controls.
+- Catalogue fees, rankings, cutoffs, and placement figures are illustrative and can become outdated.
+- Recommendation scores are rule-based fit indicators, not admission predictions.
+- Hibernate schema update is used for this capstone; a production deployment should use reviewed database migrations and operational controls.
+- Future work could include verified data sources, migration management, expanded accessibility review, and dedicated phone-width browser coverage.
 
-## Troubleshooting
+## Attribution and licensing
 
-| Symptom | Check |
-| --- | --- |
-| Application cannot connect to MySQL | Confirm MySQL is running, schema/user grants exist, and `DB_URL`, `DB_USERNAME`, and `DB_PASSWORD` are present in the terminal process. Do not print the password while diagnosing. |
-| Missing configuration error at startup | Open a new terminal after setting Windows User environment variables and verify variable presence without displaying values. |
-| Port 8080 is already in use | Stop the process that owns the port or set `SERVER_PORT` for this process. |
-| Tests try to connect to MySQL | Check that the Maven run uses `src/test/resources/application.properties`; automated tests should use the isolated H2 profile/configuration. |
-| Admin login does not work | Confirm `ADMIN_EMAIL` and `ADMIN_PASSWORD` were set before first startup. Bootstrap does not reset an existing account password. |
+Rahul Chandra Sharma is identified as the author of the CollegeWise concept and the current Java Spring Boot capstone implementation. Earlier repository history includes CollegeWise work by Aman Pushpakar, including the prior Node.js/HTML/CSS implementation and README changes; this release documentation does not relabel or deny those historical contributions.
 
-More detailed steps are in [SETUP_GUIDE.md](SETUP_GUIDE.md).
-
-## Contributing
-
-This is a personal capstone repository. For a proposed correction, open an issue or pull request with a concise description, reproduction steps, and relevant test results. Do not include real student data, credentials, or database dumps. Preserve existing history and third-party notices.
-
-## Attribution
-
-**CollegeWise — Smart College Comparison & Career Guidance System**
-**Developed by Rahul Chandra Sharma & Team**
-
-The preserved Git history includes earlier CollegeWise work credited to Aman Pushpakar and references to `amanpandaverse/CollegeWise`. The attribution above refers to the Java implementation and project changes maintained by Rahul Chandra Sharma & Team; it does not claim authorship of that earlier work or third-party material. Preserve applicable notices and licenses.
-
-## License
-
-No root `LICENSE` file or repository-wide license statement is present. The retained legacy Node backend declares `ISC` in `backend/package.json`; that package metadata does not establish a license for the entire repository. Earlier Git history credits prior CollegeWise work to Aman Pushpakar, as noted above. Preserve applicable third-party notices and licenses; do not assume that the repository grants reuse rights.
+No root `LICENSE` file or repository-wide license statement is present. Earlier legacy package metadata declared ISC for that package; it does not establish a license for the entire repository. Preserve applicable third-party licenses and notices. No repository-wide reuse license is implied here.

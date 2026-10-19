@@ -68,7 +68,11 @@ $env:SPRING_PROFILES_ACTIVE = 'demo'
 mvn spring-boot:run
 ```
 
+The default app URL is `http://localhost:8080/`; the health check is `http://localhost:8080/api/health`. Student registration and sign-in are available from the home page's Sign in modal. Admin sign-in is at `http://localhost:8080/admin-login.html`; the API endpoint is `POST /api/auth/admin/login`. Do not infer successful authorization from the UI alone: admin APIs require the server-validated administrator role.
+
 The admin bootstrap is enabled in every profile when both admin variables are present. The demo student bootstrap runs only in the `demo` profile. For a packaged run, use `java -jar target\collegewise-1.0.0.jar --spring.profiles.active=demo` in that same new window. Registration remains available at the landing page for other student accounts. Keep application database credentials in environment variables; do not commit local config files. Hibernate `ddl-auto=update` is for this capstone; production should use reviewed migrations.
+
+After the application starts, use **Admin** in the top navigation or open `http://localhost:8080/admin-login.html` (use your configured port if `SERVER_PORT` is set). Enter the same `ADMIN_EMAIL` and `ADMIN_PASSWORD` that were available when the application first created the account. The dedicated login endpoint rejects student accounts with HTTP 403, rejects invalid credentials with HTTP 401, and sets the same HttpOnly authentication cookie for a valid admin. `/admin.html` and `/api/admin/**` remain protected by the server. Bootstrap does not replace the password of an existing account; if the configured email already belongs to an admin and the password is unknown, do not expect changing the environment variable to reset it. Use an isolated local test schema for a new disposable admin or follow your deliberate account-recovery procedure.
 
 Run the tests and build from the repository root. Tests use H2 and do not connect to MySQL or seed production data.
 

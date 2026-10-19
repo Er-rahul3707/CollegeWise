@@ -72,6 +72,17 @@ public class AuthController {
         return authenticateResponse(user, HttpStatus.OK, servletRequest, response);
     }
 
+    @PostMapping("/admin/login")
+    public ResponseEntity<Token> adminLogin(@Valid @RequestBody Login request, HttpServletRequest servletRequest,
+                                            HttpServletResponse response) {
+        authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(request.email(), request.password()));
+        User user = users.findByEmailIgnoreCase(request.email()).orElseThrow();
+        if (user.getRole() != Role.ADMIN) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Administrator access is required");
+        }
+        return authenticateResponse(user, HttpStatus.OK, servletRequest, response);
+    }
+
     @PostMapping("/logout")
     public Map<String, String> logout(HttpServletRequest request, HttpServletResponse response) {
         response.setHeader(HttpHeaders.CACHE_CONTROL, "no-store");

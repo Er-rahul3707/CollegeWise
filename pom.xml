@@ -1,6 +1,12 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <groupId>com.collegewise</groupId><artifactId>collegewise</artifactId><version>1.0.0</version>
+  <developers>
+    <developer>
+      <name>Rahul Chandra Sharma</name>
+      <roles><role>Author of the Java Spring Boot capstone implementation</role></roles>
+    </developer>
+  </developers>
   <parent><groupId>org.springframework.boot</groupId><artifactId>spring-boot-starter-parent</artifactId><version>3.3.5</version><relativePath/></parent>
   <properties><java.version>17</java.version><jjwt.version>0.12.6</jjwt.version></properties>
   <dependencies>

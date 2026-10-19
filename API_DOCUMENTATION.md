@@ -5,9 +5,10 @@ JSON APIs are rooted at `/api`. Use `Authorization: Bearer <token>` for authenti
 ## Authentication
 
 - `POST /auth/register` `{ "name": "A Student", "email": "student@example.com", "password": "at-least-12-chars" }`
-- `POST /auth/login` `{ "email": "student@example.com", "password": "..." }` → bearer token, role, display name; browser clients also receive an `HttpOnly`, `SameSite=Strict` cookie
+- `POST /auth/login` `{ "email": "student@example.com", "password": "..." }` → bearer token, role, display name; browser clients also receive an `HttpOnly`, `SameSite=Strict` cookie. This endpoint accepts student accounts.
+- `POST /auth/admin/login` `{ "email": "admin@example.com", "password": "..." }` → admin bearer token and browser cookie only when the authenticated account has `ROLE_ADMIN`; a student account is forbidden.
 - `POST /auth/logout` → clears the browser cookie; bearer tokens are stateless and are not server-revoked before expiry
-- Browser navigation to `/dashboard.html` requires a student cookie; `/admin.html` requires an admin cookie. The role checks are enforced by Spring Security, not by the UI's display state.
+- Student sign-in and registration are provided by the home page authentication modal. Admin sign-in is `/admin-login.html`. Browser navigation to `/dashboard.html` requires a student cookie; `/admin.html` requires an admin cookie. Role checks are enforced by Spring Security, not by the UI's display state.
 
 ## Discovery
 

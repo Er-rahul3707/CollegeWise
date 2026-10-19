@@ -34,6 +34,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.transaction.annotation.Transactional;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
@@ -61,6 +62,39 @@ class ApiContractTest {
     @Autowired RecommendationHistoryRepository history;
     @Autowired JwtService jwt;
     @Autowired ObjectMapper mapper;
+    @Autowired PasswordEncoder passwordEncoder;
+
+    @Test
+    void adminLoginAuthenticatesRolesAndSetsCookieOnlyForAdministrators() throws Exception {
+        String suffix = UUID.randomUUID().toString();
+        String adminEmail = "admin-login-" + suffix + "@example.test";
+        String studentEmail = "student-login-" + suffix + "@example.test";
+        String password = "test-only-" + suffix + "-Aa9!";
+        users.saveAndFlush(new User("Contract Admin", adminEmail, passwordEncoder.encode(password), Role.ADMIN));
+        users.saveAndFlush(new User("Contract Student", studentEmail, passwordEncoder.encode(password), Role.STUDENT));
+
+        mvc.perform(get("/admin-login.html")).andExpect(status().isOk());
+        mvc.perform(post("/api/auth/admin/login").contentType("application/json")
+                        .content("{\"email\":\"" + adminEmail + "\",\"password\":\"wrong-password-123\"}"))
+                .andExpect(status().isUnauthorized()).andExpect(header().doesNotExist("Set-Cookie"));
+        mvc.perform(post("/api/auth/admin/login").contentType("application/json")
+                        .content("{\"email\":\"" + studentEmail + "\",\"password\":\"" + password + "\"}"))
+                .andExpect(status().isForbidden()).andExpect(header().doesNotExist("Set-Cookie"));
+
+        String response = mvc.perform(post("/api/auth/admin/login").contentType("application/json")
+                        .content("{\"email\":\"" + adminEmail + "\",\"password\":\"" + password + "\"}"))
+                .andExpect(status().isOk()).andExpect(jsonPath("$.role").value("ADMIN"))
+                .andExpect(header().string("Set-Cookie", org.hamcrest.Matchers.allOf(
+                        org.hamcrest.Matchers.containsString("HttpOnly"),
+                        org.hamcrest.Matchers.containsString("SameSite=Strict"))))
+                .andReturn().getResponse().getContentAsString();
+        String token = mapper.readTree(response).get("token").asText();
+        mvc.perform(get("/admin.html").header("Authorization", "Bearer " + token)).andExpect(status().isOk());
+        mvc.perform(get("/api/admin/dashboard").header("Authorization", "Bearer " + token))
+                .andExpect(status().isOk());
+        mvc.perform(get("/api/admin/dashboard").header("Authorization", "Bearer " + studentToken()))
+                .andExpect(status().isForbidden());
+    }
 
     @Test
     void searchAppliesTextLocationBudgetAndHostelFilters() throws Exception {

@@ -1,6 +1,6 @@
 # CollegeWise — Smart College Comparison & Career Guidance System
 
-**Developed by Rahul Chandra Sharma & Team**
+**Current Java Spring Boot implementation by Rahul Chandra Sharma**
 
 ## Project architecture
 
